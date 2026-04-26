@@ -1615,24 +1615,24 @@ const char *fault_to_string(fault_code_t code) {
 
 #include <stdint.h>
 
-/* ── Bit manipulation ─────────────────────────────────── */
+/* --- Bit manipulation --- */
 #define BIT(n)              (1UL << (n))
 #define BIT_SET(reg, mask)  ((reg) |=  (mask))
 #define BIT_CLR(reg, mask)  ((reg) &= ~(mask))
 #define BIT_TGL(reg, mask)  ((reg) ^=  (mask))
 #define BIT_GET(reg, mask)  (((reg) & (mask)) != 0U)
 
-/* ── Safe math ────────────────────────────────────────── */
+/* --- Safe math --- */
 #define CLAMP(val, lo, hi)  ((val) < (lo) ? (lo) : ((val) > (hi) ? (hi) : (val)))
 #define ARRAY_LEN(a)        (sizeof(a) / sizeof((a)[0]))
 
-/* ── Unused variable suppressor ──────────────────────── */
+/* --- Unused variable suppressor --- */
 #define UNUSED(x)           ((void)(x))
 
-/* ── Compile-time check ───────────────────────────────── */
+/* --- Compile-time check --- */
 #define STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
 
-/* ── Debug print (removed in release) ───────────────── */
+/* --- Debug print (removed in release) --- */
 #ifdef DEBUG
     #define LOG(fmt, ...) printf("[%s:%d] " fmt "\n", __func__, __LINE__, ##__VA_ARGS__)
 #else
