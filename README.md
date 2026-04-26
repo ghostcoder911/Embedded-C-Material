@@ -91,7 +91,6 @@ Welcome to the **Embedded C Study Guide** — a comprehensive, hands-on referenc
 16. [Appendix A: Top Embedded C Interview Q&A](#appendix-a)
 17. [Appendix B: Standard Library Quick Reference](#appendix-b)
 
----
 
 <a name="module-01"></a>
 ## Module 01 — Foundations & Compilation
@@ -253,7 +252,6 @@ int main(void) {
 }
 ```
 
----
 
 <a name="module-02"></a>
 ## Module 02 — Variables, Types & Constants
@@ -412,7 +410,6 @@ void led_on(void)  { *GPIOA_ODR |=  GPIOA_PIN5_SET; }
 void led_off(void) { *GPIOA_ODR &= ~GPIOA_PIN5_SET; }
 ```
 
----
 
 <a name="module-03"></a>
 ## Module 03 — Operators & Control Flow
@@ -569,7 +566,6 @@ gpio_state_t debounce_pin(void) {
 }
 ```
 
----
 
 <a name="module-04"></a>
 ## Module 04 — Functions & Scope
@@ -716,7 +712,6 @@ void process_command(command_t cmd) {
 }
 ```
 
----
 
 <a name="module-05"></a>
 ## Module 05 — Arrays & Strings
@@ -883,7 +878,6 @@ int main(void) {
 }
 ```
 
----
 
 <a name="module-06"></a>
 ## Module 06 — Pointers & Memory
@@ -1032,7 +1026,6 @@ void gpio_reset(GPIO_t *port, uint32_t pin) {
 }
 ```
 
----
 
 <a name="module-07"></a>
 ## Module 07 — Structs, Unions, Enums & Bit-Fields
@@ -1200,7 +1193,6 @@ void can_frame_print(const can_frame_t *frame) {
 }
 ```
 
----
 
 <a name="module-08"></a>
 ## Module 08 — Dynamic Memory Allocation
@@ -1352,7 +1344,6 @@ void pool_release(void *ptr) {
 }
 ```
 
----
 
 <a name="module-09"></a>
 ## Module 09 — File I/O
@@ -1476,7 +1467,6 @@ void logger_append(const log_entry_t *entry) {
 }
 ```
 
----
 
 <a name="module-10"></a>
 ## Module 10 — Preprocessor & Macros
@@ -1652,7 +1642,6 @@ const char *fault_to_string(fault_code_t code) {
 #endif /* EMBEDDED_UTILS_H */
 ```
 
----
 
 <a name="module-11"></a>
 ## Module 11 — Bit Manipulation: The Embedded Core
@@ -1802,7 +1791,6 @@ uint8_t GPIO_ReadPin(const GPIO_RegDef_t *GPIOx, uint8_t pin) {
 }
 ```
 
----
 
 <a name="module-12"></a>
 ## Module 12 — Linked Lists & Data Structures
@@ -1956,7 +1944,6 @@ void uart_process(void) {
 }
 ```
 
----
 
 <a name="module-13"></a>
 ## Module 13 — Undefined Behavior & Safe Practices
@@ -2078,7 +2065,6 @@ bool sensor_read_safe(uint8_t sensor_id, float *out_value) {
 }
 ```
 
----
 
 <a name="module-14"></a>
 ## Module 14 — Signal Handling & Variable Arguments
@@ -2195,7 +2181,6 @@ void install_fault_handlers(void) {
 }
 ```
 
----
 
 <a name="module-15"></a>
 ## Module 15 — Embedded C Patterns & Best Practices
@@ -2413,7 +2398,6 @@ void pipeline_run_once(void) {
 }
 ```
 
----
 
 <a name="appendix-a"></a>
 ## Appendix A — Top Embedded C Interview Q&A
@@ -2421,7 +2405,6 @@ void pipeline_run_once(void) {
 > [!NOTE]
 > These questions are drawn from real embedded engineer interviews at tier-1 automotive, aerospace, and consumer electronics companies.
 
----
 
 **Q1. What is the difference between `const` and `volatile`?**
 
@@ -2429,7 +2412,6 @@ void pipeline_run_once(void) {
 - `volatile` — Compiler instruction: *Don't optimize reads/writes*. The value can change outside program control (ISR, hardware, DMA).
 - Combined: `volatile const uint32_t *reg` — The register value can change (hardware), but software cannot write to it through this pointer.
 
----
 
 **Q2. What is the difference between `malloc` and `calloc`?**
 
@@ -2439,7 +2421,6 @@ void pipeline_run_once(void) {
 | Arguments | Single size | Count × element size |
 | Use when | You'll write before read | Zero-init is needed |
 
----
 
 **Q3. What is a `volatile` variable and when do you use it?**
 
@@ -2448,7 +2429,6 @@ A `volatile` variable tells the compiler it may change unexpectedly and must not
 2. Variables written in ISRs and read in main loop
 3. Variables modified by DMA
 
----
 
 **Q4. Explain the difference between `#define` and `const`.**
 
@@ -2459,13 +2439,11 @@ A `volatile` variable tells the compiler it may change unexpectedly and must not
 | Scope | Global | Respects C scoping |
 | Storage | None (textual replacement) | Usually no extra storage |
 
----
 
 **Q5. What is a bit-field and where would you use it?**
 
 A bit-field is a struct member with a specified bit width: `uint8_t flag : 1`. Used to map hardware register fields exactly, or to pack multiple boolean flags into a single byte.
 
----
 
 **Q6. What is a dangling pointer?**
 
@@ -2475,14 +2453,12 @@ int *p = malloc(4); free(p); *p = 5; /* Dangling — UB */
 ```
 Always set `p = NULL` after `free`.
 
----
 
 **Q7. What is the difference between `struct` and `union`?**
 
 - `struct`: All fields exist simultaneously; size is the sum of all fields (plus padding).
 - `union`: All fields share the same memory; size is the largest field. Writing one member and reading another is type-punning (implementation-defined).
 
----
 
 **Q8. What does `static` mean in different contexts?**
 
@@ -2492,13 +2468,11 @@ Always set `p = NULL` after `free`.
 | Global variable | File-private (invisible to other `.c` files) |
 | Function | File-private function (not visible to linker) |
 
----
 
 **Q9. What is the purpose of `#ifndef` include guards?**
 
 They prevent a header file from being included multiple times in a single translation unit, avoiding redefinition errors.
 
----
 
 **Q10. What is undefined behavior (UB)? Give two examples.**
 
@@ -2506,13 +2480,11 @@ It is a C program operation whose result the standard does not define — the co
 1. Signed integer overflow: `INT_MAX + 1`
 2. Dereferencing a null pointer: `int *p = NULL; *p = 0;`
 
----
 
 **Q11. What is a memory leak? How do you detect it?**
 
 Allocated memory that is never freed. Detected with: `valgrind --leak-check=full ./program`. Prevented by matching every `malloc` with a `free` and using RAII-style cleanup patterns.
 
----
 
 **Q12. Explain `extern` keyword.**
 
@@ -2522,7 +2494,6 @@ Allocated memory that is never freed. Detected with: `valgrind --leak-check=full
 /* file_b.c */ extern uint32_t g_tick; /* Declaration — references file_a's variable */
 ```
 
----
 
 <a name="appendix-b"></a>
 ## Appendix B — Standard Library Quick Reference
@@ -2540,7 +2511,6 @@ Allocated memory that is never freed. Detected with: `valgrind --leak-check=full
 | `size_t` | Platform | Sizes and indices |
 | `ptrdiff_t` | Platform | Pointer differences |
 
----
 
 ### `<string.h>` — String & Memory Functions
 | Function | Safe? | Description |
@@ -2557,7 +2527,6 @@ Allocated memory that is never freed. Detected with: `valgrind --leak-check=full
 | `strcpy` | ❌ | Unsafe — no bounds check |
 | `gets` | ❌ | Banned — no bounds check |
 
----
 
 ### `<stdlib.h>` — General Utilities
 | Function | Description |
@@ -2574,7 +2543,6 @@ Allocated memory that is never freed. Detected with: `valgrind --leak-check=full
 | `qsort(arr, n, size, cmp)` | Quicksort |
 | `bsearch(key, arr, n, size, cmp)` | Binary search |
 
----
 
 ### `<stdio.h>` — I/O Functions
 | Function | Description |
@@ -2591,7 +2559,6 @@ Allocated memory that is never freed. Detected with: `valgrind --leak-check=full
 | `ferror(fp)` | Check file error flag |
 | `feof(fp)` | Check end-of-file |
 
----
 
 ### `<math.h>` — Math Functions (link with `-lm`)
 | Function | Description |
@@ -2605,7 +2572,6 @@ Allocated memory that is never freed. Detected with: `valgrind --leak-check=full
 | `fminf, fmaxf` | Float min/max |
 | `roundf` | Round to nearest integer |
 
----
 
 *This guide was created for Engineers studying Embedded C. It is designed to be pushed to GitHub and used as a living reference.*
 
