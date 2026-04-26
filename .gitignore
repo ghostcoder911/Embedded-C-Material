@@ -1,0 +1,12 @@
+# Build artifacts
+examples/capstone/*.o
+examples/capstone/sensor_fsm
+
+# Editor files
+.vscode/
+*.swp
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
