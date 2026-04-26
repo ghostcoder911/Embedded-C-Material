@@ -2,7 +2,7 @@
 
 ![C Intro](./imgs/c_intro.png)
 
-Welcome to the **Embedded C Study Guide** — a comprehensive, hands-on reference for engineers working with microcontrollers, bare-metal systems, and performance-critical C code. Inspired by real-world embedded practice and MISRA-C guidelines.
+Welcome to the **Embedded C Study Guide** - a comprehensive, hands-on reference for engineers working with microcontrollers, bare-metal systems, and performance-critical C code. Inspired by real-world embedded practice and MISRA-C guidelines.
 
 ## Table of Contents
 
@@ -20,7 +20,7 @@ Welcome to the **Embedded C Study Guide** — a comprehensive, hands-on referenc
     - [Foundation Cementing: MCU Register Config](#module-02-foundation)
 3. [Module 03: Operators & Control Flow](#module-03)
     - [Arithmetic & Relational Operators](#module-03-arith)
-    - [Bitwise Operators — The Embedded Core](#module-03-bitwise)
+    - [Bitwise Operators - The Embedded Core](#module-03-bitwise)
     - [Control Flow: `if`, `switch`, Ternary](#module-03-flow)
     - [Foundation Cementing: GPIO State Machine](#module-03-foundation)
 4. [Module 04: Functions & Scope](#module-04)
@@ -63,7 +63,7 @@ Welcome to the **Embedded C Study Guide** — a comprehensive, hands-on referenc
     - [`_Static_assert` & Predefined Macros](#module-10-assert)
     - [X-Macros Pattern](#module-10-xmacro)
     - [Foundation Cementing: Safe Macro Toolkit](#module-10-foundation)
-11. [Module 11: Bit Manipulation — The Embedded Core](#module-11)
+11. [Module 11: Bit Manipulation - The Embedded Core](#module-11)
     - [Setting, Clearing & Toggling Bits](#module-11-ops)
     - [Register Masking Patterns](#module-11-masks)
     - [Bit Shifting & Endianness](#module-11-shift)
@@ -93,20 +93,20 @@ Welcome to the **Embedded C Study Guide** — a comprehensive, hands-on referenc
 
 
 <a name="module-01"></a>
-## Module 01 — Foundations & Compilation
+## Module 01 - Foundations & Compilation
 *Phase: Foundations*
 
 C is a compiled, statically-typed, procedural language created by Dennis Ritchie in 1972 at Bell Labs. In embedded systems, it is the dominant language because it gives programmers direct control over memory and hardware while producing compact, efficient machine code.
 
 > [!NOTE]
-> **Design Philosophy**: Before writing a single line of C, you must understand how the compiler transforms text into instructions a CPU can execute. Embedded systems often have no operating system to save you — if your code crashes, the chip resets or hangs forever.
+> **Design Philosophy**: Before writing a single line of C, you must understand how the compiler transforms text into instructions a CPU can execute. Embedded systems often have no operating system to save you - if your code crashes, the chip resets or hangs forever.
 
 > **Who Uses This In The Real World?**
 >
-> * **STM32/NXP Firmware** — All register-level peripheral drivers are written in C.
-> * **Linux Kernel** — Entirely written in C for portability across architectures.
-> * **Arduino Core** — The underlying HAL is pure C.
-> * **Automotive ECUs (Bosch, Continental)** — AUTOSAR layers are implemented in MISRA-C.
+> * **STM32/NXP Firmware** - All register-level peripheral drivers are written in C.
+> * **Linux Kernel** - Entirely written in C for portability across architectures.
+> * **Arduino Core** - The underlying HAL is pure C.
+> * **Automotive ECUs (Bosch, Continental)** - AUTOSAR layers are implemented in MISRA-C.
 
 <a name="module-01-pipeline"></a>
 ### The GCC Compilation Pipeline
@@ -117,11 +117,11 @@ C code goes through four distinct stages before becoming executable firmware:
 | :--- | :--- | :--- |
 | **1. Preprocessor** | Expands `#include`, `#define`, `#ifdef`. Produces `.i` file. | `gcc -E main.c -o main.i` |
 | **2. Compiler** | Translates C to assembly (`.s`). Applies optimizations. | `gcc -S main.c -o main.s` |
-| **3. Assembler** | Converts assembly to object code (`.o` — binary, not yet linked). | `gcc -c main.c -o main.o` |
+| **3. Assembler** | Converts assembly to object code (`.o` - binary, not yet linked). | `gcc -c main.c -o main.o` |
 | **4. Linker** | Combines `.o` files, resolves symbols, produces final ELF/binary. | `gcc -o firmware main.o` |
 
 > [!TIP]
-> In embedded cross-compilation, you use `arm-none-eabi-gcc` instead of `gcc`. The pipeline is identical — only the target architecture changes.
+> In embedded cross-compilation, you use `arm-none-eabi-gcc` instead of `gcc`. The pipeline is identical - only the target architecture changes.
 
 <a name="module-01-first"></a>
 ### Your First Embedded Program
@@ -139,10 +139,10 @@ int main(void) {
 
 #### Anatomy of the Program
 
-* **`#include <stdio.h>`** — Preprocessor directive. Before compilation, the preprocessor copies the entire contents of `stdio.h` into your file. This gives you `printf`, `scanf`, `fopen`, etc.
-* **`#include <stdint.h>`** — Brings in fixed-width integer types (`uint8_t`, `int32_t`, etc.). **Always include this in embedded code.** The size of `int` varies by platform; `int32_t` does not.
-* **`int main(void)`** — The mandatory entry point. `void` explicitly states the function takes no parameters. In embedded, `main()` often never returns — it enters an infinite loop.
-* **`return 0;`** — Signals success to the OS. On bare-metal, this is either omitted or replaced by `while(1) {}`.
+* **`#include <stdio.h>`** - Preprocessor directive. Before compilation, the preprocessor copies the entire contents of `stdio.h` into your file. This gives you `printf`, `scanf`, `fopen`, etc.
+* **`#include <stdint.h>`** - Brings in fixed-width integer types (`uint8_t`, `int32_t`, etc.). **Always include this in embedded code.** The size of `int` varies by platform; `int32_t` does not.
+* **`int main(void)`** - The mandatory entry point. `void` explicitly states the function takes no parameters. In embedded, `main()` often never returns - it enters an infinite loop.
+* **`return 0;`** - Signals success to the OS. On bare-metal, this is either omitted or replaced by `while(1) {}`.
 
 **Compile and Run:**
 ```bash
@@ -150,16 +150,16 @@ gcc -std=c11 -Wall -Wextra -o firmware main.c
 ./firmware
 ```
 
-**Bad Practice — Avoid**
+**Bad Practice - Avoid**
 ```c
-// Missing return type — implicit int is banned in C99+
+// Missing return type - implicit int is banned in C99+
 main() { printf("Hello\n"); }
 
 // Using int where size matters for hardware
 int reg_value = 0xFF;  // Is int 16-bit or 32-bit? Platform-dependent!
 
 // Implicit function declarations (banned in C99)
-int x = atoi("42");    // Without #include <stdlib.h> — undefined behavior!
+int x = atoi("42");    // Without #include <stdlib.h> - undefined behavior!
 ```
 
 **Good Practice**
@@ -225,7 +225,7 @@ clean:
 <a name="module-01-foundation"></a>
 ### Foundation Cementing: The System Heartbeat
 
-A minimal "heartbeat" — the first thing any embedded system boots into:
+A minimal "heartbeat" - the first thing any embedded system boots into:
 
 ```c
 #include <stdio.h>
@@ -254,7 +254,7 @@ int main(void) {
 
 
 <a name="module-02"></a>
-## Module 02 — Variables, Types & Constants
+## Module 02 - Variables, Types & Constants
 *Phase: Foundations*
 
 C's type system is simple but powerful. In embedded systems, **choosing the wrong type can corrupt hardware registers, cause silent overflow, or waste precious RAM**.
@@ -283,7 +283,7 @@ C's type system is simple but powerful. In embedded systems, **choosing the wron
 > [!IMPORTANT]
 > Use `size_t` for array indices and sizes. Mixing `int` and `size_t` comparisons with `-Wconversion` enabled will produce compiler warnings that **hide real bugs**.
 
-**Bad Practice — Avoid**
+**Bad Practice - Avoid**
 ```c
 int data = 0xFF;         /* What's the size? 16? 32? 64-bit? */
 unsigned int timeout = 5000; /* Still platform-dependent width */
@@ -306,23 +306,23 @@ size_t   buffer_index = 0U;
 
 These three are **the most misunderstood C keywords in embedded development**.
 
-#### `const` — Read-only after initialization
+#### `const` - Read-only after initialization
 ```c
 const uint32_t CLOCK_SPEED_HZ = 168000000UL; /* Cannot be modified */
 ```
 `const` is enforced by the **compiler**. It means: *"I promise not to write to this."*
 
-#### `volatile` — Do not optimize away reads/writes
+#### `volatile` - Do not optimize away reads/writes
 ```c
 /* Memory-mapped GPIO Output Data Register */
 volatile uint32_t * const GPIOA_ODR = (volatile uint32_t *)0x40020014U;
 ```
-`volatile` tells the compiler: *"This value can change outside of program control (by hardware, ISR, or another thread). Do NOT cache it in a register — always read/write memory directly."*
+`volatile` tells the compiler: *"This value can change outside of program control (by hardware, ISR, or another thread). Do NOT cache it in a register - always read/write memory directly."*
 
 > [!WARNING]
 > **Every memory-mapped peripheral register MUST be `volatile`.** Without it, the compiler's optimizer will eliminate "redundant" reads/writes, breaking your driver silently. This is one of the most common bugs in embedded C.
 
-#### `#define` — Preprocessor text substitution
+#### `#define` - Preprocessor text substitution
 ```c
 #define MAX_SENSORS    8U
 #define TIMEOUT_MS     100U
@@ -352,7 +352,7 @@ volatile uint32_t * const GPIOA_ODR = (volatile uint32_t *)0x40020014U;
 | `register` | Hint for register | Auto lifetime | Local block |
 
 > [!TIP]
-> `static` on a local variable is a key embedded pattern. It retains its value between function calls — ideal for counters, state flags, and debounce timers:
+> `static` on a local variable is a key embedded pattern. It retains its value between function calls - ideal for counters, state flags, and debounce timers:
 > ```c
 > void button_isr(void) {
 >     static uint32_t press_count = 0U; /* Persists across ISR calls */
@@ -377,7 +377,7 @@ void foo(void) {
 ```
 
 > [!WARNING]
-> In embedded, **avoid large local arrays**. They live on the stack. Stack overflow on an MCU is silent — it corrupts other variables or causes random resets. Use global or static arrays for buffers.
+> In embedded, **avoid large local arrays**. They live on the stack. Stack overflow on an MCU is silent - it corrupts other variables or causes random resets. Use global or static arrays for buffers.
 
 <a name="module-02-foundation"></a>
 ### Foundation Cementing: MCU Register Configuration
@@ -396,7 +396,7 @@ volatile uint32_t * const RCC_AHB1ENR  = (volatile uint32_t *)(RCC_BASE  + 0x30U
 volatile uint32_t * const GPIOA_MODER  = (volatile uint32_t *)(GPIOA_BASE + 0x00U);
 volatile uint32_t * const GPIOA_ODR    = (volatile uint32_t *)(GPIOA_BASE + 0x14U);
 
-/* Bit-mask constants — use #define for hardware bit positions */
+/* Bit-mask constants - use #define for hardware bit positions */
 #define RCC_AHB1ENR_GPIOAEN   (1UL << 0)   /* Bit 0: GPIOA clock enable */
 #define GPIOA_PIN5_OUTPUT     (1UL << 10)  /* MODER bits [11:10] = 01 for output */
 #define GPIOA_PIN5_SET        (1UL << 5)   /* ODR bit 5 */
@@ -412,11 +412,11 @@ void led_off(void) { *GPIOA_ODR &= ~GPIOA_PIN5_SET; }
 
 
 <a name="module-03"></a>
-## Module 03 — Operators & Control Flow
+## Module 03 - Operators & Control Flow
 *Phase: Foundations*
 
 > [!NOTE]
-> **Design Philosophy**: In embedded C, the **bitwise operators** are not advanced topics — they are everyday tools. Every GPIO set, every register configuration, every protocol byte is built with `|`, `&`, `^`, and `~`.
+> **Design Philosophy**: In embedded C, the **bitwise operators** are not advanced topics - they are everyday tools. Every GPIO set, every register configuration, every protocol byte is built with `|`, `&`, `^`, and `~`.
 
 <a name="module-03-arith"></a>
 ### Arithmetic & Relational Operators
@@ -424,13 +424,13 @@ void led_off(void) { *GPIOA_ODR &= ~GPIOA_PIN5_SET; }
 | Operator | Example | Notes |
 | :--- | :--- | :--- |
 | `+`, `-`, `*`, `/` | `rpm = ticks / gear_ratio;` | Integer division truncates |
-| `%` | `index = count % BUFFER_SIZE;` | Modulo — key for ring buffers |
+| `%` | `index = count % BUFFER_SIZE;` | Modulo - key for ring buffers |
 | `==`, `!=`, `<`, `>`, `<=`, `>=` | `if (temp > 85)` | Returns 0 or 1 |
-| `&&`, `\|\|`, `!` | `if (ready && !error)` | Logical — short-circuit evaluation |
+| `&&`, `\|\|`, `!` | `if (ready && !error)` | Logical - short-circuit evaluation |
 
-**Bad Practice — Avoid**
+**Bad Practice - Avoid**
 ```c
-/* Floating point equality — NEVER do this */
+/* Floating point equality - NEVER do this */
 float voltage = 3.3f;
 if (voltage == 3.3f) { /* FALSE! Floating-point is inexact */ }
 
@@ -450,16 +450,16 @@ float ratio = (float)raw_counts / (float)full_scale;
 ```
 
 <a name="module-03-bitwise"></a>
-### Bitwise Operators — The Embedded Core
+### Bitwise Operators - The Embedded Core
 
 | Operator | Name | Example | Result |
 | :--- | :--- | :--- | :--- |
-| `&` | AND | `0xF0 & 0x3C` | `0x30` — mask/clear bits |
-| `\|` | OR | `0xF0 \| 0x0F` | `0xFF` — set bits |
-| `^` | XOR | `0xFF ^ 0x0F` | `0xF0` — toggle bits |
-| `~` | NOT | `~0x0F` | `0xFFFFFFF0` — invert all bits |
-| `<<` | Left shift | `1U << 5` | `0x20` — multiply by 2^5 |
-| `>>` | Right shift | `0x40 >> 2` | `0x10` — divide by 4 |
+| `&` | AND | `0xF0 & 0x3C` | `0x30` - mask/clear bits |
+| `\|` | OR | `0xF0 \| 0x0F` | `0xFF` - set bits |
+| `^` | XOR | `0xFF ^ 0x0F` | `0xF0` - toggle bits |
+| `~` | NOT | `~0x0F` | `0xFFFFFFF0` - invert all bits |
+| `<<` | Left shift | `1U << 5` | `0x20` - multiply by 2^5 |
+| `>>` | Right shift | `0x40 >> 2` | `0x10` - divide by 4 |
 
 **The Three Essential Patterns:**
 ```c
@@ -497,7 +497,7 @@ if (battery_pct > 80U) {
     trigger_low_battery_alarm();
 }
 
-/* switch — preferred for FSM state dispatch */
+/* switch - preferred for FSM state dispatch */
 switch (system_state) {
     case STATE_IDLE:
         handle_idle();
@@ -514,26 +514,26 @@ switch (system_state) {
         break;
 }
 
-/* Ternary — use sparingly, only for simple conditional assignments */
+/* Ternary - use sparingly, only for simple conditional assignments */
 uint8_t out = (temp > 85U) ? 0xFFU : 0x00U;
 ```
 
 > [!TIP]
-> In MISRA-C Rule 15.7: Every `if-else if` chain **must** terminate with a final `else`. Every `switch` **must** have a `default`. This ensures all code paths are explicitly handled — critical for safety systems.
+> In MISRA-C Rule 15.7: Every `if-else if` chain **must** terminate with a final `else`. Every `switch` **must** have a `default`. This ensures all code paths are explicitly handled - critical for safety systems.
 
 **Loops**
 ```c
-/* for loop — preferred when iteration count is known */
+/* for loop - preferred when iteration count is known */
 for (uint8_t i = 0U; i < NUM_SENSORS; i++) {
     read_sensor(i);
 }
 
-/* while loop — preferred for event-driven polling */
+/* while loop - preferred for event-driven polling */
 while (!uart_rx_ready()) {
     /* Wait for byte */
 }
 
-/* do-while — executes at least once */
+/* do-while - executes at least once */
 do {
     status = spi_transfer(cmd);
 } while (status == SPI_BUSY);
@@ -568,20 +568,20 @@ gpio_state_t debounce_pin(void) {
 
 
 <a name="module-04"></a>
-## Module 04 — Functions & Scope
+## Module 04 - Functions & Scope
 *Phase: Foundations*
 
 > [!NOTE]
-> **Design Philosophy**: In embedded C, functions are not just for code reuse — they define the **call stack depth**. On an MCU with 4KB of RAM, every nested function call consumes stack space. Understanding this is the difference between a stable firmware and one that crashes at 3AM in production.
+> **Design Philosophy**: In embedded C, functions are not just for code reuse - they define the **call stack depth**. On an MCU with 4KB of RAM, every nested function call consumes stack space. Understanding this is the difference between a stable firmware and one that crashes at 3AM in production.
 
 <a name="module-04-anatomy"></a>
 ### Function Anatomy & Call Stack
 
 ```c
-/* Declaration (prototype) — goes in header file */
+/* Declaration (prototype) - goes in header file */
 int32_t calculate_pid(int32_t setpoint, int32_t measured);
 
-/* Definition — goes in source file */
+/* Definition - goes in source file */
 int32_t calculate_pid(int32_t setpoint, int32_t measured) {
     static float integral = 0.0f;  /* Persistent accumulator */
     const float KP = 0.5f;
@@ -606,7 +606,7 @@ int32_t calculate_pid(int32_t setpoint, int32_t measured) {
 ### `static`, `inline`, and `extern`
 
 ```c
-/* static function — visible only within this .c file */
+/* static function - visible only within this .c file */
 /* Use for internal "private" helper functions */
 static uint16_t crc16_compute(const uint8_t *buf, size_t len) {
     uint16_t crc = 0xFFFFU;
@@ -616,7 +616,7 @@ static uint16_t crc16_compute(const uint8_t *buf, size_t len) {
     return crc;
 }
 
-/* inline — compiler hint to expand function in-place (avoids call overhead) */
+/* inline - compiler hint to expand function in-place (avoids call overhead) */
 /* Ideal for tiny, frequently-called functions */
 static inline uint32_t clamp_u32(uint32_t val, uint32_t lo, uint32_t hi) {
     if (val < lo) return lo;
@@ -624,7 +624,7 @@ static inline uint32_t clamp_u32(uint32_t val, uint32_t lo, uint32_t hi) {
     return val;
 }
 
-/* extern — declare a variable defined in another .c file */
+/* extern - declare a variable defined in another .c file */
 extern uint32_t g_system_tick; /* Defined in main.c, used here */
 ```
 
@@ -635,13 +635,13 @@ extern uint32_t g_system_tick; /* Defined in main.c, used here */
 ### Recursion & Stack Depth
 
 ```c
-/* Recursive factorial — educational only, avoid in embedded */
+/* Recursive factorial - educational only, avoid in embedded */
 uint32_t factorial(uint32_t n) {
     if (n == 0U) return 1U;
     return n * factorial(n - 1U); /* Each call adds a stack frame! */
 }
 
-/* Iterative version — always prefer in embedded */
+/* Iterative version - always prefer in embedded */
 uint32_t factorial_iter(uint32_t n) {
     uint32_t result = 1U;
     for (uint32_t i = 2U; i <= n; i++) {
@@ -671,7 +671,7 @@ void on_timeout(uint8_t id)      { /* ... */ }
 event_handler_t handler = on_button_press;
 handler(1U); /* Calls on_button_press(1) */
 
-/* Array of function pointers — the dispatch table */
+/* Array of function pointers - the dispatch table */
 event_handler_t handlers[2] = { on_button_press, on_timeout };
 handlers[0](0U); /* Calls on_button_press */
 handlers[1](1U); /* Calls on_timeout */
@@ -698,7 +698,7 @@ static void handle_start(void)  { /* Start motors */ }
 static void handle_stop(void)   { /* Stop motors  */ }
 static void handle_status(void) { /* Report state */ }
 
-/* Dispatch table — indexed by command ID */
+/* Dispatch table - indexed by command ID */
 static const cmd_handler_t dispatch[CMD_COUNT] = {
     [CMD_START]  = handle_start,
     [CMD_STOP]   = handle_stop,
@@ -714,11 +714,11 @@ void process_command(command_t cmd) {
 
 
 <a name="module-05"></a>
-## Module 05 — Arrays & Strings
+## Module 05 - Arrays & Strings
 *Phase: Data Handling*
 
 > [!NOTE]
-> **Design Philosophy**: In C, arrays and strings are not high-level objects with built-in safety — they are raw memory regions. Buffer overflows are **the #1 source of vulnerabilities in C code**. Embedded firmware with buffer bugs can corrupt critical variables or overwrite return addresses.
+> **Design Philosophy**: In C, arrays and strings are not high-level objects with built-in safety - they are raw memory regions. Buffer overflows are **the #1 source of vulnerabilities in C code**. Embedded firmware with buffer bugs can corrupt critical variables or overwrite return addresses.
 
 <a name="module-05-arrays"></a>
 ### Arrays: Declaration & Iteration
@@ -743,10 +743,10 @@ for (size_t i = 0U; i < NUM_SAMPLES; i++) {
 size_t len = sizeof(samples) / sizeof(samples[0]);
 ```
 
-**Bad Practice — Avoid**
+**Bad Practice - Avoid**
 ```c
 uint8_t buf[10];
-buf[10] = 0xFF; /* OUT OF BOUNDS — undefined behavior, may corrupt stack */
+buf[10] = 0xFF; /* OUT OF BOUNDS - undefined behavior, may corrupt stack */
 
 /* 'Magic number' array size */
 for (int i = 0; i < 10; i++) { /* What if the array changes to 12? */ }
@@ -775,7 +775,7 @@ float imu_data[NUM_SENSORS][NUM_AXES] = {{0.0f}};
 /* Access: imu_data[sensor][axis] */
 imu_data[0][0] = read_accel_x();
 
-/* Row-major iteration — most cache-friendly */
+/* Row-major iteration - most cache-friendly */
 for (size_t s = 0U; s < NUM_SENSORS; s++) {
     for (size_t a = 0U; a < NUM_AXES; a++) {
         process(imu_data[s][a]);
@@ -804,7 +804,7 @@ memset(buf, 0, sizeof(buf));         /* Zero fill */
 ```
 
 > [!WARNING]
-> **`strcpy` and `strcat` are dangerous** — they do not check buffer size. They are banned in MISRA-C and most secure coding standards. Always use the bounded variants.
+> **`strcpy` and `strcat` are dangerous** - they do not check buffer size. They are banned in MISRA-C and most secure coding standards. Always use the bounded variants.
 
 <a name="module-05-safe"></a>
 ### Safe String Handling
@@ -880,11 +880,11 @@ int main(void) {
 
 
 <a name="module-06"></a>
-## Module 06 — Pointers & Memory
+## Module 06 - Pointers & Memory
 *Phase: Core C*
 
 > [!NOTE]
-> **Design Philosophy**: Pointers are C's most powerful — and most dangerous — feature. In embedded, pointers are how you write hardware registers, implement callbacks, pass large structs efficiently, and build dynamic data structures. Mastering pointers is non-negotiable for embedded engineers.
+> **Design Philosophy**: Pointers are C's most powerful - and most dangerous - feature. In embedded, pointers are how you write hardware registers, implement callbacks, pass large structs efficiently, and build dynamic data structures. Mastering pointers is non-negotiable for embedded engineers.
 
 <a name="module-06-basics"></a>
 ### Pointer Fundamentals
@@ -902,7 +902,7 @@ printf("Voltage: %u mV\n", *p_voltage);  /* 3300 */
 *p_voltage = 5000U;
 printf("Voltage: %u mV\n", voltage_mv); /* 5000 */
 
-/* NULL pointer — always initialize unused pointers to NULL */
+/* NULL pointer - always initialize unused pointers to NULL */
 uint8_t *p_data = NULL;
 if (p_data != NULL) { /* Always guard before dereferencing */
     *p_data = 0xFF;
@@ -926,12 +926,12 @@ uint8_t *p = buf;   /* Points to buf[0] */
 printf("0x%02X\n", *p);         /* 0xAA */
 p++;                             /* Advance by sizeof(uint8_t) = 1 byte */
 printf("0x%02X\n", *p);         /* 0xBB */
-printf("0x%02X\n", *(p + 2));   /* 0xDD — does not move p */
+printf("0x%02X\n", *(p + 2));   /* 0xDD - does not move p */
 
 /* Pointer difference */
 uint8_t *start = buf;
 uint8_t *end   = buf + 4;
-ptrdiff_t span = end - start;  /* 4 — use ptrdiff_t for differences */
+ptrdiff_t span = end - start;  /* 4 - use ptrdiff_t for differences */
 ```
 
 > [!WARNING]
@@ -943,19 +943,19 @@ ptrdiff_t span = end - start;  /* 4 — use ptrdiff_t for differences */
 ```c
 uint32_t val = 42U;
 
-/* Pointer to const — cannot modify value through pointer */
+/* Pointer to const - cannot modify value through pointer */
 const uint32_t *p_ro = &val;
 /* *p_ro = 99U; */ /* ERROR: read-only */
 
-/* Const pointer — pointer cannot be redirected */
+/* Const pointer - pointer cannot be redirected */
 uint32_t * const p_fixed = &val;
-*p_fixed = 99U;   /* OK — can modify value */
+*p_fixed = 99U;   /* OK - can modify value */
 /* p_fixed = ...; */ /* ERROR: pointer is const */
 
-/* Const pointer to const — fully read-only */
+/* Const pointer to const - fully read-only */
 const uint32_t * const p_full_ro = &val;
 
-/* Pointer to pointer — used for output parameters */
+/* Pointer to pointer - used for output parameters */
 void get_buffer(uint8_t **pp_buf) {
     static uint8_t internal_buf[64];
     *pp_buf = internal_buf; /* Write the address into caller's pointer */
@@ -1010,7 +1010,7 @@ typedef struct {
 #define GPIOA  ((GPIO_t *)0x40020000UL)
 #define GPIOB  ((GPIO_t *)0x40020400UL)
 
-/* Access registers by name — clean, readable, type-safe */
+/* Access registers by name - clean, readable, type-safe */
 void gpio_init_output(GPIO_t *port, uint32_t pin) {
     /* Clear mode bits, then set to output (01) */
     port->MODER &= ~(0x3UL << (pin * 2U));
@@ -1028,11 +1028,11 @@ void gpio_reset(GPIO_t *port, uint32_t pin) {
 
 
 <a name="module-07"></a>
-## Module 07 — Structs, Unions, Enums & Bit-Fields
+## Module 07 - Structs, Unions, Enums & Bit-Fields
 *Phase: Data Modeling*
 
 > [!NOTE]
-> **Design Philosophy**: Structs are the foundation of **hardware abstraction** in C. A peripheral register block is a struct. A sensor reading is a struct. A CAN frame is a struct. Knowing how to model data precisely — including bit-level layout with bit-fields — separates a firmware engineer from a programmer.
+> **Design Philosophy**: Structs are the foundation of **hardware abstraction** in C. A peripheral register block is a struct. A sensor reading is a struct. A CAN frame is a struct. Knowing how to model data precisely - including bit-level layout with bit-fields - separates a firmware engineer from a programmer.
 
 <a name="module-07-structs"></a>
 ### Structs & Typedef
@@ -1040,14 +1040,14 @@ void gpio_reset(GPIO_t *port, uint32_t pin) {
 ```c
 #include <stdint.h>
 
-/* Without typedef — must always write 'struct SensorData' */
+/* Without typedef - must always write 'struct SensorData' */
 struct SensorData {
     uint16_t raw_adc;
     float    temperature;
     uint8_t  sensor_id;
 };
 
-/* With typedef — write just 'sensor_data_t' */
+/* With typedef - write just 'sensor_data_t' */
 typedef struct {
     uint16_t raw_adc;
     float    temperature;
@@ -1062,14 +1062,14 @@ sensor_data_t reading = {
     .sensor_id   = 3U,
 };
 
-/* Pass by pointer — avoids copying struct on every function call */
+/* Pass by pointer - avoids copying struct on every function call */
 void process_sensor(const sensor_data_t *data) {
     printf("Sensor %u: %.2f C\n", data->sensor_id, data->temperature);
 }
 ```
 
 > [!TIP]
-> Use **designated initializers** (`.field = value`) to initialize structs — they are order-independent, self-documenting, and zero-initialize any unspecified fields.
+> Use **designated initializers** (`.field = value`) to initialize structs - they are order-independent, self-documenting, and zero-initialize any unspecified fields.
 
 **Struct Memory Layout:**
 ```
@@ -1195,11 +1195,11 @@ void can_frame_print(const can_frame_t *frame) {
 
 
 <a name="module-08"></a>
-## Module 08 — Dynamic Memory Allocation
+## Module 08 - Dynamic Memory Allocation
 *Phase: Memory Management*
 
 > [!NOTE]
-> **Design Philosophy**: Dynamic memory (`malloc`/`free`) is a double-edged sword. On a Linux host, it's convenient. On a bare-metal MCU with 64KB RAM, fragmentation and non-deterministic allocation time can **kill your real-time guarantees**. Understand both — then know when to avoid it.
+> **Design Philosophy**: Dynamic memory (`malloc`/`free`) is a double-edged sword. On a Linux host, it's convenient. On a bare-metal MCU with 64KB RAM, fragmentation and non-deterministic allocation time can **kill your real-time guarantees**. Understand both - then know when to avoid it.
 
 <a name="module-08-alloc"></a>
 ### `malloc`, `calloc`, `realloc`, `free`
@@ -1209,7 +1209,7 @@ void can_frame_print(const can_frame_t *frame) {
 #include <string.h>
 #include <stdint.h>
 
-/* malloc — allocate uninitialized memory */
+/* malloc - allocate uninitialized memory */
 uint8_t *buf = malloc(256);
 if (buf == NULL) {
     /* ALWAYS check! malloc returns NULL on failure */
@@ -1217,11 +1217,11 @@ if (buf == NULL) {
     return;
 }
 
-/* calloc — allocate AND zero-initialize */
+/* calloc - allocate AND zero-initialize */
 uint32_t *table = calloc(64, sizeof(uint32_t));
 if (table == NULL) { /* check */ }
 
-/* realloc — resize an existing allocation */
+/* realloc - resize an existing allocation */
 uint8_t *bigger_buf = realloc(buf, 512);
 if (bigger_buf == NULL) {
     /* Original buf still valid! Don't lose it. */
@@ -1230,7 +1230,7 @@ if (bigger_buf == NULL) {
 }
 buf = bigger_buf;
 
-/* free — always free when done */
+/* free - always free when done */
 free(buf);
 buf = NULL;   /* NULL-ify after free to prevent use-after-free */
 free(table);
@@ -1252,7 +1252,7 @@ table = NULL;
 /* USE-AFTER-FREE */
 uint8_t *p = malloc(64);
 free(p);
-p[0] = 0xFF; /* BUG: p is freed — UB */
+p[0] = 0xFF; /* BUG: p is freed - UB */
 
 /* Fix: set to NULL after free */
 free(p);
@@ -1262,7 +1262,7 @@ p = NULL;
 void sensor_loop(void) {
     uint8_t *buf = malloc(128); /* Allocated every call */
     process(buf);
-    /* BUG: forgot free(buf) — leaks 128B every iteration */
+    /* BUG: forgot free(buf) - leaks 128B every iteration */
 }
 ```
 
@@ -1346,7 +1346,7 @@ void pool_release(void *ptr) {
 
 
 <a name="module-09"></a>
-## Module 09 — File I/O
+## Module 09 - File I/O
 *Phase: Data Handling*
 
 > [!NOTE]
@@ -1367,7 +1367,7 @@ void log_sensor_data(float temperature, uint32_t timestamp_ms) {
         return;
     }
     fprintf(fp, "%u,%.2f\n", timestamp_ms, temperature);
-    fclose(fp); /* Always close — flushes buffer to disk */
+    fclose(fp); /* Always close - flushes buffer to disk */
 }
 
 /* Reading a binary file */
@@ -1469,17 +1469,17 @@ void logger_append(const log_entry_t *entry) {
 
 
 <a name="module-10"></a>
-## Module 10 — Preprocessor & Macros
+## Module 10 - Preprocessor & Macros
 *Phase: Build System & Safety*
 
 > [!NOTE]
-> **Design Philosophy**: The C preprocessor runs before compilation — it sees text, not code. Used well, it enables **portable, configurable firmware**. Used carelessly, it creates untraceable bugs that the debugger can never find.
+> **Design Philosophy**: The C preprocessor runs before compilation - it sees text, not code. Used well, it enables **portable, configurable firmware**. Used carelessly, it creates untraceable bugs that the debugger can never find.
 
 <a name="module-10-guards"></a>
 ### Include Guards & Conditional Compilation
 
 ```c
-/* sensor.h — Every header MUST have include guards */
+/* sensor.h - Every header MUST have include guards */
 #ifndef SENSOR_H
 #define SENSOR_H
 
@@ -1530,16 +1530,16 @@ void sensor_read(sensor_t *s);
 
 **Bad Macro Practice:**
 ```c
-/* Missing parentheses — operator precedence bug */
+/* Missing parentheses - operator precedence bug */
 #define DOUBLE(x) x * 2
 int y = DOUBLE(3 + 1); /* Expands to: 3 + 1 * 2 = 5, not 8! */
 
-/* Double evaluation — dangerous with side effects */
+/* Double evaluation - dangerous with side effects */
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
-int r = MAX(x++, y++); /* x++ or y++ evaluated TWICE — undefined behavior! */
+int r = MAX(x++, y++); /* x++ or y++ evaluated TWICE - undefined behavior! */
 ```
 
-**Good Practice — Use `static inline` instead:**
+**Good Practice - Use `static inline` instead:**
 ```c
 /* A static inline function has type safety and no double-evaluation */
 static inline int32_t max_i32(int32_t a, int32_t b) {
@@ -1554,11 +1554,11 @@ static inline int32_t max_i32(int32_t a, int32_t b) {
 #include <stdint.h>
 #include <assert.h>
 
-/* Compile-time assertion — fails at build time, not runtime */
+/* Compile-time assertion - fails at build time, not runtime */
 _Static_assert(sizeof(uint32_t) == 4U, "uint32_t must be 4 bytes");
 _Static_assert(sizeof(can_frame_t) == 16U, "CAN frame struct size changed!");
 
-/* Runtime assertion — disabled when NDEBUG is defined */
+/* Runtime assertion - disabled when NDEBUG is defined */
 void process(const uint8_t *buf, size_t len) {
     assert(buf != NULL);
     assert(len > 0U);
@@ -1575,7 +1575,7 @@ printf("Date: %s\n",     __DATE__);   /* Compilation date */
 <a name="module-10-xmacro"></a>
 ### X-Macros Pattern
 
-X-macros generate repetitive code from a single list — the DRY principle applied to macros:
+X-macros generate repetitive code from a single list - the DRY principle applied to macros:
 
 ```c
 /* Define the "X-list" of fault codes */
@@ -1644,7 +1644,7 @@ const char *fault_to_string(fault_code_t code) {
 
 
 <a name="module-11"></a>
-## Module 11 — Bit Manipulation: The Embedded Core
+## Module 11 - Bit Manipulation: The Embedded Core
 *Phase: Hardware Interface*
 
 > [!NOTE]
@@ -1793,7 +1793,7 @@ uint8_t GPIO_ReadPin(const GPIO_RegDef_t *GPIOx, uint8_t pin) {
 
 
 <a name="module-12"></a>
-## Module 12 — Linked Lists & Data Structures
+## Module 12 - Linked Lists & Data Structures
 *Phase: Data Structures in C*
 
 > [!NOTE]
@@ -1812,7 +1812,7 @@ typedef struct node {
     struct node *next;
 } node_t;
 
-/* Insert at head — O(1) */
+/* Insert at head - O(1) */
 node_t *list_push(node_t *head, uint32_t val) {
     node_t *n = malloc(sizeof(node_t));
     if (n == NULL) return head;
@@ -1821,7 +1821,7 @@ node_t *list_push(node_t *head, uint32_t val) {
     return n;
 }
 
-/* Remove head — O(1) */
+/* Remove head - O(1) */
 node_t *list_pop(node_t *head, uint32_t *out_val) {
     if (head == NULL) return NULL;
     if (out_val) *out_val = head->data;
@@ -1881,7 +1881,7 @@ void dlist_remove(dnode_t *node) {
 <a name="module-12-ring"></a>
 ### Circular Buffer (Ring Buffer)
 
-The ring buffer is the **most important embedded data structure** — used in every UART driver, audio stream, and sensor queue:
+The ring buffer is the **most important embedded data structure** - used in every UART driver, audio stream, and sensor queue:
 
 ```c
 #include <stdint.h>
@@ -1946,11 +1946,11 @@ void uart_process(void) {
 
 
 <a name="module-13"></a>
-## Module 13 — Undefined Behavior & Safe Practices
+## Module 13 - Undefined Behavior & Safe Practices
 *Phase: Safety & Correctness*
 
 > [!NOTE]
-> **Design Philosophy**: C's undefined behavior (UB) is not a compiler bug — it's a contract violation. When you invoke UB, the compiler is allowed to assume it never happens and generate code accordingly, leading to **unpredictable, security-breaking behavior** that may only manifest in release builds with optimization enabled.
+> **Design Philosophy**: C's undefined behavior (UB) is not a compiler bug - it's a contract violation. When you invoke UB, the compiler is allowed to assume it never happens and generate code accordingly, leading to **unpredictable, security-breaking behavior** that may only manifest in release builds with optimization enabled.
 
 <a name="module-13-ub"></a>
 ### Common Undefined Behavior in C
@@ -1959,16 +1959,16 @@ void uart_process(void) {
 | :--- | :--- | :--- |
 | Null dereference | `*ptr` when `ptr == NULL` | Hard fault / crash |
 | Out-of-bounds access | `arr[10]` on `arr[9]` | Corrupts adjacent memory |
-| Signed integer overflow | `INT_MAX + 1` | Anything — compiler may optimize away checks |
+| Signed integer overflow | `INT_MAX + 1` | Anything - compiler may optimize away checks |
 | Shift by negative/oversized | `1 << 32` on 32-bit | Undefined result |
 | Use-after-free | Access freed pointer | Corrupts heap |
 | Modifying string literal | `char *s = "hi"; s[0] = 'H';` | Segfault or silent corruption |
 | Unsequenced side effects | `i = i++ + ++i;` | Unpredictable value |
 
 ```c
-/* DANGEROUS — signed overflow is UB */
+/* DANGEROUS - signed overflow is UB */
 int32_t x = INT32_MAX;
-int32_t y = x + 1; /* UB: overflow — optimizer may remove bounds checks */
+int32_t y = x + 1; /* UB: overflow - optimizer may remove bounds checks */
 
 /* Safe alternative: check before adding */
 if (x < INT32_MAX) {
@@ -2052,7 +2052,7 @@ bool sensor_read_safe(uint8_t sensor_id, float *out_value) {
 
     float raw = read_adc_channel(sensor_id); /* Platform HAL */
 
-    /* Range validation — reject implausible readings */
+    /* Range validation - reject implausible readings */
     if (raw < -40.0f || raw > 150.0f) {
         s->state = SENSOR_FAULT;
         return false;
@@ -2067,7 +2067,7 @@ bool sensor_read_safe(uint8_t sensor_id, float *out_value) {
 
 
 <a name="module-14"></a>
-## Module 14 — Signal Handling & Variable Arguments
+## Module 14 - Signal Handling & Variable Arguments
 *Phase: System Programming*
 
 <a name="module-14-signal"></a>
@@ -2183,11 +2183,11 @@ void install_fault_handlers(void) {
 
 
 <a name="module-15"></a>
-## Module 15 — Embedded C Patterns & Best Practices
+## Module 15 - Embedded C Patterns & Best Practices
 *Phase: Production Firmware*
 
 > [!NOTE]
-> **Design Philosophy**: Professional embedded firmware is not just correct C — it is **architectured** C. Finite State Machines, hardware abstraction layers, callback registries, and defensive design patterns are the difference between hobby firmware and production firmware running in an aircraft or EV.
+> **Design Philosophy**: Professional embedded firmware is not just correct C - it is **architectured** C. Finite State Machines, hardware abstraction layers, callback registries, and defensive design patterns are the difference between hobby firmware and production firmware running in an aircraft or EV.
 
 <a name="module-15-fsm"></a>
 ### Finite State Machine (FSM)
@@ -2255,7 +2255,7 @@ typedef void (*callback_fn_t)(void *ctx, uint32_t event_id);
 
 typedef struct {
     callback_fn_t fn;
-    void         *ctx;  /* User context — passed back to callback */
+    void         *ctx;  /* User context - passed back to callback */
 } callback_entry_t;
 
 static callback_entry_t g_callbacks[MAX_CALLBACKS];
@@ -2288,7 +2288,7 @@ void led_callback(void *ctx, uint32_t evt) {
 ### Hardware Abstraction Layer (HAL) Design
 
 ```c
-/* hal_uart.h — Abstract UART interface */
+/* hal_uart.h - Abstract UART interface */
 #ifndef HAL_UART_H
 #define HAL_UART_H
 
@@ -2303,7 +2303,7 @@ typedef struct {
     uart_baud_t baud;
 } uart_config_t;
 
-/* HAL interface — implemented per platform */
+/* HAL interface - implemented per platform */
 bool     hal_uart_init(const uart_config_t *cfg);
 bool     hal_uart_tx_byte(uint8_t port, uint8_t byte);
 bool     hal_uart_rx_byte(uint8_t port, uint8_t *out);
@@ -2314,7 +2314,7 @@ void     hal_uart_deinit(uint8_t port);
 ```
 
 > [!TIP]
-> The HAL pattern means your application layer calls `hal_uart_tx_byte()` regardless of whether it's running on STM32, NRF52, or Linux. **Only the HAL implementation file changes per platform** — the application code is fully portable.
+> The HAL pattern means your application layer calls `hal_uart_tx_byte()` regardless of whether it's running on STM32, NRF52, or Linux. **Only the HAL implementation file changes per platform** - the application code is fully portable.
 
 <a name="module-15-raii"></a>
 ### RAII-in-C Patterns
@@ -2400,7 +2400,7 @@ void pipeline_run_once(void) {
 
 
 <a name="appendix-a"></a>
-## Appendix A — Top Embedded C Interview Q&A
+## Appendix A - Top Embedded C Interview Q&A
 
 > [!NOTE]
 > These questions are drawn from real embedded engineer interviews at tier-1 automotive, aerospace, and consumer electronics companies.
@@ -2408,9 +2408,9 @@ void pipeline_run_once(void) {
 
 **Q1. What is the difference between `const` and `volatile`?**
 
-- `const` — Compiler-enforced: *I won't write to this*. The value may still change (e.g., if you also have `volatile const`).
-- `volatile` — Compiler instruction: *Don't optimize reads/writes*. The value can change outside program control (ISR, hardware, DMA).
-- Combined: `volatile const uint32_t *reg` — The register value can change (hardware), but software cannot write to it through this pointer.
+- `const` - Compiler-enforced: *I won't write to this*. The value may still change (e.g., if you also have `volatile const`).
+- `volatile` - Compiler instruction: *Don't optimize reads/writes*. The value can change outside program control (ISR, hardware, DMA).
+- Combined: `volatile const uint32_t *reg` - The register value can change (hardware), but software cannot write to it through this pointer.
 
 
 **Q2. What is the difference between `malloc` and `calloc`?**
@@ -2449,7 +2449,7 @@ A bit-field is a struct member with a specified bit width: `uint8_t flag : 1`. U
 
 A pointer that references memory that has been freed or gone out of scope:
 ```c
-int *p = malloc(4); free(p); *p = 5; /* Dangling — UB */
+int *p = malloc(4); free(p); *p = 5; /* Dangling - UB */
 ```
 Always set `p = NULL` after `free`.
 
@@ -2476,7 +2476,7 @@ They prevent a header file from being included multiple times in a single transl
 
 **Q10. What is undefined behavior (UB)? Give two examples.**
 
-It is a C program operation whose result the standard does not define — the compiler may do anything. Examples:
+It is a C program operation whose result the standard does not define - the compiler may do anything. Examples:
 1. Signed integer overflow: `INT_MAX + 1`
 2. Dereferencing a null pointer: `int *p = NULL; *p = 0;`
 
@@ -2491,14 +2491,14 @@ Allocated memory that is never freed. Detected with: `valgrind --leak-check=full
 `extern` declares a variable or function that is **defined** in another translation unit. It tells the linker to find the definition elsewhere:
 ```c
 /* file_a.c */ uint32_t g_tick = 0;   /* Definition */
-/* file_b.c */ extern uint32_t g_tick; /* Declaration — references file_a's variable */
+/* file_b.c */ extern uint32_t g_tick; /* Declaration - references file_a's variable */
 ```
 
 
 <a name="appendix-b"></a>
-## Appendix B — Standard Library Quick Reference
+## Appendix B - Standard Library Quick Reference
 
-### `<stdint.h>` — Fixed-Width Integer Types
+### `<stdint.h>` - Fixed-Width Integer Types
 | Type | Width | Range |
 |---|---|---|
 | `uint8_t` | 8-bit | 0–255 |
@@ -2512,7 +2512,7 @@ Allocated memory that is never freed. Detected with: `valgrind --leak-check=full
 | `ptrdiff_t` | Platform | Pointer differences |
 
 
-### `<string.h>` — String & Memory Functions
+### `<string.h>` - String & Memory Functions
 | Function | Safe? | Description |
 |---|---|---|
 | `memcpy(dst, src, n)` | ✅ | Copy `n` bytes (no overlap) |
@@ -2520,15 +2520,15 @@ Allocated memory that is never freed. Detected with: `valgrind --leak-check=full
 | `memset(buf, val, n)` | ✅ | Fill `n` bytes with `val` |
 | `memcmp(a, b, n)` | ✅ | Compare `n` bytes |
 | `strlen(s)` | ✅ | String length (not counting `\0`) |
-| `strncpy(dst, src, n)` | ⚠️ | Bounded copy — add `\0` manually |
+| `strncpy(dst, src, n)` | ⚠️ | Bounded copy - add `\0` manually |
 | `strncat(dst, src, n)` | ⚠️ | Bounded concat |
 | `snprintf(buf, n, fmt, ...)` | ✅ | Safe formatted print |
 | `strcmp(a, b)` | ✅ | String compare (0 = equal) |
-| `strcpy` | ❌ | Unsafe — no bounds check |
-| `gets` | ❌ | Banned — no bounds check |
+| `strcpy` | ❌ | Unsafe - no bounds check |
+| `gets` | ❌ | Banned - no bounds check |
 
 
-### `<stdlib.h>` — General Utilities
+### `<stdlib.h>` - General Utilities
 | Function | Description |
 |---|---|
 | `malloc(size)` | Allocate `size` bytes (uninitialized) |
@@ -2544,7 +2544,7 @@ Allocated memory that is never freed. Detected with: `valgrind --leak-check=full
 | `bsearch(key, arr, n, size, cmp)` | Binary search |
 
 
-### `<stdio.h>` — I/O Functions
+### `<stdio.h>` - I/O Functions
 | Function | Description |
 |---|---|
 | `printf(fmt, ...)` | Print to stdout |
@@ -2560,7 +2560,7 @@ Allocated memory that is never freed. Detected with: `valgrind --leak-check=full
 | `feof(fp)` | Check end-of-file |
 
 
-### `<math.h>` — Math Functions (link with `-lm`)
+### `<math.h>` - Math Functions (link with `-lm`)
 | Function | Description |
 |---|---|
 | `fabsf(x)` | Float absolute value |
