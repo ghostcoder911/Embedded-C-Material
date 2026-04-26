@@ -1,4 +1,4 @@
-# Embedded C — From Foundations to Bare-Metal
+# Embedded C - From Foundations to Bare-Metal
 
 ![C Intro](./imgs/c_intro.png)
 
